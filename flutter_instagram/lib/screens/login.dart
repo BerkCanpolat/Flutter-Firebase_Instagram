@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_instagram/resource/auth.dart';
+import 'package:flutter_instagram/respons/layoutresponsScreen.dart';
+import 'package:flutter_instagram/respons/mobilScreen.dart';
+import 'package:flutter_instagram/respons/webScreen.dart';
+import 'package:flutter_instagram/screens/signup.dart';
+import 'package:flutter_instagram/utils/utils.dart';
 import 'package:flutter_instagram/widgets/textField.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -14,6 +20,27 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool isLoading = false;
+
+
+  void loginControl() async{
+    setState(() {
+      isLoading = true;
+    });
+    String res = await AuthMethod().login(emailController.text, passwordController.text);
+    if(res != "Giriş Başarılı"){
+      showSnackBar(context, "Giriş Başarısız");
+    }else{
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => LayoutScreen(webScreen: WebScreen(), mobilcreen: MobilScreen())));
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+    void navigatoControl(){
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SignUpScreen()));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +59,12 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(height: 20,),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(onPressed: (){}, child: Text("Giriş Yap"),)),
+                height: 45,
+                child: ElevatedButton(
+                  onPressed: loginControl, 
+                  child: isLoading ? Center(child: CircularProgressIndicator(color: Colors.white,),) : Text("Giriş Yap"),
+                  )
+                  ),
               Padding(
                 padding: const EdgeInsets.only(top: 20),
                 child: Container(
@@ -40,7 +72,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       Text("Henüz bir hesabın yok mu?"),
                       SizedBox(width: 5,),
-                      Text("Kaydol",style: TextStyle(fontWeight: FontWeight.bold),),
+                      InkWell(
+                        onTap: navigatoControl,
+                        child: Text("Kaydol",style: TextStyle(fontWeight: FontWeight.bold),)),
                     ],
                   ),
                 ),
